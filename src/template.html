@@ -59,9 +59,9 @@
     <div id="drop-zone">
       <div class="drop-icon">📄</div>
       <div class="drop-label">Drop a file here or click to browse</div>
-      <div class="drop-sub">Convert to Markdown for cheaper AI context — or paste a screenshot or copied web page anywhere</div>
+      <div class="drop-sub">Convert to Markdown for cheaper AI context, or open a .md file to read it. You can also paste a screenshot or copied web page anywhere.</div>
       <button id="browse-btn">Browse file</button>
-      <input id="file-input" type="file" accept=".pdf,application/pdf,image/*,.html,.htm,text/html" style="display:none">
+      <input id="file-input" type="file" accept=".pdf,application/pdf,image/*,.html,.htm,text/html,.md,.markdown,.txt,text/markdown,text/plain" style="display:none">
     </div>
 
     <!-- URL input -->
@@ -83,6 +83,7 @@
       <button id="btn-view-md">Markdown</button>
       <button id="btn-view-preview">Preview</button>
       <button id="btn-view-split">Split</button>
+      <button id="btn-view-read" title="Distraction-free reading">Read</button>
     </div>
     <div class="spacer"></div>
     <button id="btn-copy">Copy</button>
@@ -119,11 +120,12 @@
 <div id="info-modal" class="hidden">
   <div id="info-card">
     <button id="info-close" aria-label="Close">×</button>
-    <h2>What can I convert?</h2>
+    <h2>What can I convert or read?</h2>
     <table class="info-table">
       <tr><td class="info-icon">✅</td><td class="info-format">PDF</td><td>Text extraction + OCR for scanned pages</td></tr>
       <tr><td class="info-icon">✅</td><td class="info-format">Images</td><td>PNG, JPG, WEBP, TIFF and others via OCR</td></tr>
       <tr><td class="info-icon">✅</td><td class="info-format">HTML</td><td>Markup stripped, structure preserved</td></tr>
+      <tr><td class="info-icon">📖</td><td class="info-format">Markdown</td><td>.md / .txt files open straight into the Read view</td></tr>
       <tr class="info-dim"><td class="info-icon">ℹ</td><td class="info-format">DOCX&nbsp;/ XLSX</td><td>Most AI tools accept these natively — no conversion needed</td></tr>
       <tr class="info-dim"><td class="info-icon">ℹ</td><td class="info-format">CSV&nbsp;/ TXT</td><td>Already plain text — no conversion needed</td></tr>
       <tr class="info-dim"><td class="info-icon">🔜</td><td class="info-format">PPTX</td><td>Not yet supported</td></tr>

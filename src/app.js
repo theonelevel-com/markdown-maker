@@ -2,7 +2,7 @@
 (function () {
   'use strict';
 
-  const APP_VERSION = '0.4.1';
+  const APP_VERSION = '0.5.0';
 
   // ── DOM refs ──────────────────────────────────────────────────────────────
   const dropZone    = document.getElementById('drop-zone');
@@ -19,6 +19,7 @@
   const btnMd       = document.getElementById('btn-view-md');
   const btnPreview  = document.getElementById('btn-view-preview');
   const btnSplit    = document.getElementById('btn-view-split');
+  const btnRead     = document.getElementById('btn-view-read');
   const toolbar     = document.getElementById('toolbar');
   const themeBtn    = document.getElementById('theme-btn');
   const infoBtn     = document.getElementById('info-btn');
@@ -66,7 +67,11 @@
   infoBtn.addEventListener('click', () => infoModal.classList.remove('hidden'));
   infoClose.addEventListener('click', () => infoModal.classList.add('hidden'));
   infoModal.addEventListener('click', e => { if (e.target === infoModal) infoModal.classList.add('hidden'); });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') infoModal.classList.add('hidden'); });
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape') return;
+    if (!infoModal.classList.contains('hidden')) { infoModal.classList.add('hidden'); return; }
+    if (outputArea.dataset.view === 'read') setView(lastEditView);
+  });
 
   // ── Drag & drop ───────────────────────────────────────────────────────────
   dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
@@ -114,17 +119,30 @@
   });
 
   // ── View toggles ──────────────────────────────────────────────────────────
+  // 'read' is a per-document reader mode; it isn't remembered, so conversions
+  // still open in the user's preferred working view.
+  let lastEditView = 'split';
   function setView(mode) {
     outputArea.dataset.view = mode;
+    document.body.classList.toggle('reading', mode === 'read');
     btnMd.classList.toggle('active', mode === 'md');
     btnPreview.classList.toggle('active', mode === 'preview');
     btnSplit.classList.toggle('active', mode === 'split');
-    localStorage.setItem('lo-view', mode);
+    btnRead.classList.toggle('active', mode === 'read');
+    if (mode !== 'read') {
+      lastEditView = mode;
+      try { localStorage.setItem('lo-view', mode); } catch (_) {}
+    }
   }
   btnMd.addEventListener('click', () => setView('md'));
   btnPreview.addEventListener('click', () => setView('preview'));
   btnSplit.addEventListener('click', () => setView('split'));
-  setView(localStorage.getItem('lo-view') || 'split');
+  btnRead.addEventListener('click', () => setView(outputArea.dataset.view === 'read' ? lastEditView : 'read'));
+  (function () {
+    let v = 'split';
+    try { v = localStorage.getItem('lo-view') || 'split'; } catch (_) {}
+    setView(['md', 'preview', 'split'].includes(v) ? v : 'split');
+  })();
 
   // ── Copy & download ───────────────────────────────────────────────────────
   btnCopy.addEventListener('click', async () => {
@@ -163,6 +181,7 @@
     if (mime === 'application/pdf' || /\.pdf$/i.test(name)) return 'pdf';
     if (mime.startsWith('image/') || /\.(png|jpe?g|webp|tiff?|bmp|gif)$/i.test(name)) return 'image';
     if (mime === 'text/html' || /\.html?$/i.test(name)) return 'html';
+    if (/\.(md|markdown|mdown|mkd|txt)$/i.test(name) || mime === 'text/markdown' || mime === 'text/plain') return 'markdown';
     return null;
   }
 
@@ -170,7 +189,7 @@
     if (converting) return;
     const kind = classifyFile(file);
     if (!kind) {
-      showError('Unsupported file type. Drop a PDF, image, or HTML file.');
+      showError('Unsupported file type. Drop a PDF, image, HTML or Markdown file.');
       return;
     }
     converting = true;
@@ -208,9 +227,17 @@
         showProgress('Converting HTML…', 20);
         markdown = await HtmlConverter.convertHtml(file);
         showProgress('Done.', 100);
+
+      } else if (kind === 'markdown') {
+        // Already Markdown: no conversion, just open it for reading.
+        showProgress('Opening…', 50);
+        displayMarkdown(await file.text());
+        setView('read');
+        return;
       }
 
       displayMarkdown(markdown);
+      if (outputArea.dataset.view === 'read') setView(lastEditView);
     } catch (err) {
       showError('Conversion failed: ' + err.message);
       console.error(err);

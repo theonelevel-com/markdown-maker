@@ -398,6 +398,27 @@ body.light .icon-sun  { display: none; }
 #output-area[data-view="preview"] .preview-pane { flex: 1; }
 #output-area[data-view="split"]   .md-pane    { flex: 1; }
 #output-area[data-view="split"]   .preview-pane { flex: 1; }
+#output-area[data-view="read"]    .md-pane    { display: none; }
+#output-area[data-view="read"]    .preview-pane { flex: 1; }
+#output-area[data-view="read"]    .preview-pane .pane-label { display: none; }
+
+/* ── Reader mode: full height, comfortable measure, larger type ──────────── */
+body.reading #output-area { max-height: none; min-height: calc(100vh - 200px); }
+#output-area[data-view="read"] #md-preview {
+  width: 100%;
+  max-width: 72ch;
+  margin: 0 auto;
+  padding: 32px 28px 48px;
+  font-size: 1.05rem;
+  line-height: 1.8;
+}
+#output-area[data-view="read"] .preview-pane { overflow-y: auto; }
+#output-area[data-view="read"] #md-preview { overflow: visible; flex: none; }
+#output-area[data-view="read"] #md-preview h1 { font-size: 1.8em; }
+#output-area[data-view="read"] #md-preview h2 { font-size: 1.35em; margin-top: 1.4em; }
+#output-area[data-view="read"] #md-preview h3 { font-size: 1.1em; margin-top: 1.2em; }
+#output-area[data-view="read"] #md-preview p  { margin: 0.8em 0; }
+#output-area[data-view="read"] #md-preview img { max-width: 100%; height: auto; }
 
 .md-pane, .preview-pane {
   background: var(--bg2);
@@ -493,4 +514,5 @@ body.light .footer a { color: #6c63ff; }
 /* ── Responsive ──────────────────────────────────────────────────────────── */
 @media (max-width: 680px) {
   #output-area[data-view="split"] { flex-direction: column; }
+  #output-area[data-view="read"] #md-preview { padding: 20px 16px 32px; font-size: 1rem; }
 }
